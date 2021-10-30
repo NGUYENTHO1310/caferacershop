@@ -1,0 +1,96 @@
+2021-10-24T10:56:37+00:00 CRITICAL Uncaught Error: Undefined constant "get_footer" in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T10:56:49+00:00 CRITICAL Uncaught Error: Undefined constant "get_footer" in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T10:59:19+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T10:59:21+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:00:25+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:00:27+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:00:28+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:00:30+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:00:33+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_part() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:02:00+00:00 CRITICAL Uncaught Error: Call to undefined function get_teamplate_parts() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:03:48+00:00 CRITICAL Uncaught Error: Call to undefined function get_template_parts() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
+2021-10-24T11:03:50+00:00 CRITICAL Uncaught Error: Call to undefined function get_template_parts() in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php:9
+Stack trace:
+#0 D:\XAMPP\htdocs\caferacershop\wp-includes\template-loader.php(106): include()
+#1 D:\XAMPP\htdocs\caferacershop\wp-blog-header.php(19): require_once('D:\\XAMPP\\htdocs...')
+#2 D:\XAMPP\htdocs\caferacershop\index.php(17): require('D:\\XAMPP\\htdocs...')
+#3 {main}
+  thrown in D:\XAMPP\htdocs\caferacershop\wp-content\themes\caferacershop\templates\template-home.php on line 9
+
