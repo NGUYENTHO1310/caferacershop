@@ -53,5 +53,20 @@ get_header ();?>
     <?php echo do_shortcode('[sale_products]'); ?>
   </div>
 </section>
-
+<!-- brand block -->
+<section class="block brandBlock">
+  <div class="container">
+    <ul>
+      <?php 
+        $args = array( 'post_type' => 'brands','posts_per_page' =>  '20' );
+        $loop = new WP_Query( $args );
+        while ( $loop->have_posts() ) : $loop->the_post();
+      ?> 	
+      <li>
+        <?php the_post_thumbnail(); ?>
+      </li>
+      <?php endwhile; ?>
+    </ul>
+  </div>
+</section>
 <?php get_footer(); ?>
