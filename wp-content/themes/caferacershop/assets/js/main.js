@@ -36,5 +36,10 @@ $('.brandBlock ul').slick({
 	  }
 	]
   });
-  
+// openClose
+$('.openClose .content').hide();
+$('.openClose h3').click(function() {
+  $(this).next().slideToggle();
+  $(this).toggleClass('openCloseActive');
+});
   

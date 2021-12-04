@@ -10,6 +10,7 @@ use MailPoet\Config\Renderer as ConfigRenderer;
 use MailPoet\DI\ContainerWrapper;
 use MailPoet\Entities\FormEntity;
 use MailPoet\Form\Renderer as FormRenderer;
+use MailPoet\Form\Util\CustomFonts;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Util\Security;
 use MailPoet\WP\Functions as WPFunctions;
@@ -27,6 +28,9 @@ class Widget extends \WP_Widget {
   /** @var FormsRepository */
   private $formsRepository;
 
+  /** @var CustomFonts */
+  private $customFonts;
+
   public function __construct() {
     parent::__construct(
       'mailpoet_form',
@@ -38,6 +42,8 @@ class Widget extends \WP_Widget {
     $this->assetsController = new AssetsController($this->wp, $this->renderer, SettingsController::getInstance());
     $this->formRenderer = ContainerWrapper::getInstance()->get(FormRenderer::class);
     $this->formsRepository = ContainerWrapper::getInstance()->get(FormsRepository::class);
+    $this->customFonts = ContainerWrapper::getInstance()->get(CustomFonts::class);
+
     if (!is_admin()) {
       $this->setupIframe();
     } else {
@@ -85,6 +91,7 @@ class Widget extends \WP_Widget {
         'ajax_url' => WPFunctions::get()->adminUrl('admin-ajax.php', 'absolute'),
         'is_rtl' => $isRtl,
       ],
+      'fonts_link' => $this->customFonts->generateHtmlCustomFontLink(),
     ];
 
     try {
@@ -117,7 +124,7 @@ class Widget extends \WP_Widget {
       ]
     );
 
-    $formEditUrl = WPFunctions::get()->adminUrl('admin.php?page=mailpoet-form-editor&id=');
+    $formEditUrl = WPFunctions::get()->adminUrl('admin.php?page=mailpoet-form-editor-template-selection');
 
     // set title
     $title = isset($instance['title']) ? strip_tags($instance['title']) : '';
@@ -140,39 +147,20 @@ class Widget extends \WP_Widget {
     <p>
       <select class="widefat" id="<?php echo $this->get_field_id('form') ?>" name="<?php echo $this->get_field_name('form'); ?>">
         <?php
+        // Select the first one from the list if none selected
+        if ($selectedForm === 0 && !empty($forms)) $selectedForm = $forms[0]->getId();
         foreach ($forms as $form) {
           $isSelected = ($selectedForm === $form->getId()) ? 'selected="selected"' : '';
-          $formName = $form->getName() ? $this->wp->escHtml($form->getName()) : "({$this->wp->_x('no name', 'fallback for forms without a name in a form list')})"
+          $formName = $form->getName() ? $this->wp->escHtml($form->getName()) : "({$this->wp->_x('no name', 'fallback for forms without a name in a form list')})";
+          $formName .= $form->getStatus() === FormEntity::STATUS_DISABLED ? ' (' . __('inactive', 'mailpoet') . ')' : '';
           ?>
         <option value="<?php echo $form->getId(); ?>" <?php echo $isSelected; ?>><?php echo $formName; ?></option>
         <?php }  ?>
       </select>
     </p>
     <p>
-      <a href="javascript:;" onClick="createSubscriptionForm()" class="mailpoet_form_new"><?php WPFunctions::get()->_e('Create a new form', 'mailpoet'); ?></a>
+      <a href="<?php echo $formEditUrl; ?>" target="_blank" class="mailpoet_form_new"><?php WPFunctions::get()->_e('Create a new form', 'mailpoet'); ?></a>
     </p>
-    <script type="text/javascript">
-      function createSubscriptionForm() {
-        MailPoet.Ajax.post({
-          endpoint: 'forms',
-          action: 'create',
-          api_version: window.mailpoet_api_version
-        }).done(function(response) {
-          if (response.data && response.data.id) {
-            window.location =
-              "<?php echo $formEditUrl; ?>" + response.data.id;
-          }
-        }).fail((response) => {
-          if (response.errors.length > 0) {
-            MailPoet.Notice.error(
-              response.errors.map((error) => { return error.message; }),
-              { scroll: true }
-            );
-          }
-        });
-        return false;
-      }
-    </script>
     <?php
     return '';
   }
@@ -200,8 +188,16 @@ class Widget extends \WP_Widget {
     );
 
     // get form
-    if (empty($instance['form'])) return '';
-    $form = $this->formsRepository->findOneById($instance['form']);
+    if (!empty($instance['form'])) {
+      $form = $this->formsRepository->findOneById($instance['form']);
+    } else {
+      // Backwards compatibility for MAILPOET-3847
+      // Get first non deleted form
+      $forms = $this->formsRepository->findBy(['deletedAt' => null], ['name' => 'asc']);
+      if (empty($forms)) return '';
+      $form = $forms[0];
+    }
+
     if (!$form) return '';
     if ($form->getDeletedAt()) return '';
     if ($form->getStatus() !== FormEntity::STATUS_ENABLED) return '';

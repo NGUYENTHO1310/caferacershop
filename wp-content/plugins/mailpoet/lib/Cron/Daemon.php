@@ -72,6 +72,7 @@ class Daemon {
     yield $this->workersFactory->createQueueWorker(); // not CronWorkerInterface compatible
     yield $this->workersFactory->createSendingServiceKeyCheckWorker();
     yield $this->workersFactory->createPremiumKeyCheckWorker();
+    yield $this->workersFactory->createSubscribersStatsReportWorker();
     yield $this->workersFactory->createBounceWorker();
     yield $this->workersFactory->createExportFilesCleanupWorker();
     yield $this->workersFactory->createBeamerkWorker();
@@ -88,5 +89,6 @@ class Daemon {
     if ($this->featureSwitch->isSupported(FeaturesController::RE_ENGAGEMENT_EMAIL)) {
       yield $this->workersFactory->createReEngagementEmailsSchedulerWorker();
     }
+    yield $this->workersFactory->createNewsletterTemplateThumbnailsWorker();
   }
 }

@@ -9,12 +9,15 @@ use MailPoet\Cron\CronTrigger;
 use MailPoet\Cron\Workers\AuthorizedSendingEmailsCheck;
 use MailPoet\Cron\Workers\Beamer;
 use MailPoet\Cron\Workers\InactiveSubscribers;
+use MailPoet\Cron\Workers\NewsletterTemplateThumbnails;
 use MailPoet\Cron\Workers\StatsNotifications\Worker;
 use MailPoet\Cron\Workers\SubscriberLinkTokens;
 use MailPoet\Cron\Workers\SubscribersLastEngagement;
 use MailPoet\Cron\Workers\UnsubscribeTokens;
 use MailPoet\Entities\FormEntity;
 use MailPoet\Entities\NewsletterEntity;
+use MailPoet\Entities\NewsletterLinkEntity;
+use MailPoet\Entities\NewsletterTemplateEntity;
 use MailPoet\Entities\ScheduledTaskEntity;
 use MailPoet\Entities\SendingQueueEntity;
 use MailPoet\Entities\StatisticsFormEntity;
@@ -22,7 +25,6 @@ use MailPoet\Entities\UserFlagEntity;
 use MailPoet\Form\FormsRepository;
 use MailPoet\Mailer\MailerLog;
 use MailPoet\Models\Newsletter;
-use MailPoet\Models\NewsletterLink;
 use MailPoet\Models\ScheduledTask;
 use MailPoet\Models\Segment;
 use MailPoet\Models\SendingQueue;
@@ -155,6 +157,8 @@ class Populator {
       'LifestyleBlogB',
       'Painter',
       'FarmersMarket',
+      'ConfirmInterestBeforeDeactivation',
+      'ConfirmInterestOrUnsubscribe',
     ];
     $this->formsRepository = $formsRepository;
     $this->entityManager = $entityManager;
@@ -187,6 +191,8 @@ class Populator {
     $this->addPlacementStatusToForms();
     $this->migrateFormPlacement();
     $this->scheduleSubscriberLastEngagementDetection();
+    $this->moveNewsletterTemplatesThumbnailData();
+    $this->scheduleNewsletterTemplateThumbnails();
   }
 
   private function createMailPoetPage() {
@@ -664,15 +670,18 @@ class Populator {
     );
   }
 
-  private function scheduleTask($type, $datetime) {
+  private function scheduleTask($type, $datetime, $priority = null) {
     $task = ScheduledTask::where('type', $type)
-      ->whereRaw('status = ? OR status IS NULL', [ScheduledTask::STATUS_SCHEDULED])
+      ->whereRaw('(status = ? OR status IS NULL)', [ScheduledTask::STATUS_SCHEDULED])
       ->findOne();
     if ($task) {
       return true;
     }
     $task = ScheduledTask::create();
     $task->type = $type;
+    if ($priority !== null) {
+      $task->priority = $priority;
+    }
     $task->status = ScheduledTask::STATUS_SCHEDULED;
     $task->scheduledAt = $datetime;
     $task->save();
@@ -695,9 +704,9 @@ class Populator {
     global $wpdb;
     $wpdb->query(sprintf(
       $query,
-      NewsletterLink::$_table,
-      NewsletterLink::INSTANT_UNSUBSCRIBE_LINK_SHORT_CODE,
-      NewsletterLink::UNSUBSCRIBE_LINK_SHORT_CODE
+      $this->entityManager->getClassMetadata(NewsletterLinkEntity::class)->getTableName(),
+      NewsletterLinkEntity::INSTANT_UNSUBSCRIBE_LINK_SHORT_CODE,
+      NewsletterLinkEntity::UNSUBSCRIBE_LINK_SHORT_CODE
     ));
   }
 
@@ -719,7 +728,7 @@ class Populator {
           t.status = :tStatusScheduled
           AND n.status = :nStatusDraft
     ";
-    $this->entityManager->getConnection()->executeUpdate(
+    $this->entityManager->getConnection()->executeStatement(
       $query,
       [
         'tStatusPaused' => ScheduledTaskEntity::STATUS_PAUSED,
@@ -894,12 +903,32 @@ class Populator {
   }
 
   private function scheduleSubscriberLastEngagementDetection() {
-    if (version_compare($this->settings->get('db_version', '3.68.1'), '3.68.0', '>')) {
+    if (version_compare($this->settings->get('db_version', '3.72.1'), '3.72.0', '>')) {
       return;
     }
     $this->scheduleTask(
       SubscribersLastEngagement::TASK_TYPE,
       Carbon::createFromTimestamp($this->wp->currentTime('timestamp'))
+    );
+  }
+
+  private function scheduleNewsletterTemplateThumbnails() {
+    $this->scheduleTask(
+      NewsletterTemplateThumbnails::TASK_TYPE,
+      Carbon::createFromTimestamp($this->wp->currentTime('timestamp')),
+      ScheduledTaskEntity::PRIORITY_LOW
+    );
+  }
+
+  private function moveNewsletterTemplatesThumbnailData() {
+    if (version_compare($this->settings->get('db_version', '3.73.3'), '3.73.2', '>')) {
+      return;
+    }
+    $newsletterTemplatesTable = $this->entityManager->getClassMetadata(NewsletterTemplateEntity::class)->getTableName();
+    $this->entityManager->getConnection()->executeQuery("
+      UPDATE " . $newsletterTemplatesTable . "
+      SET thumbnail_data = thumbnail, thumbnail = NULL
+      WHERE thumbnail LIKE 'data:image%';"
     );
   }
 }

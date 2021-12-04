@@ -7,8 +7,21 @@ if (!defined('ABSPATH')) exit;
 
 use MailPoet\Config\ServicesChecker;
 use MailPoet\Cron\CronTrigger;
+use MailPoet\Entities\DynamicSegmentFilterData;
 use MailPoet\Newsletter\NewslettersRepository;
+use MailPoet\Segments\DynamicSegments\DynamicSegmentFilterRepository;
+use MailPoet\Segments\DynamicSegments\Filters\EmailAction;
+use MailPoet\Segments\DynamicSegments\Filters\EmailOpensAbsoluteCountAction;
+use MailPoet\Segments\DynamicSegments\Filters\MailPoetCustomFields;
+use MailPoet\Segments\DynamicSegments\Filters\SubscriberSubscribedDate;
+use MailPoet\Segments\DynamicSegments\Filters\UserRole;
+use MailPoet\Segments\DynamicSegments\Filters\WooCommerceCategory;
+use MailPoet\Segments\DynamicSegments\Filters\WooCommerceCountry;
+use MailPoet\Segments\DynamicSegments\Filters\WooCommerceNumberOfOrders;
+use MailPoet\Segments\DynamicSegments\Filters\WooCommerceSubscription;
+use MailPoet\Segments\DynamicSegments\Filters\WooCommerceTotalSpent;
 use MailPoet\Segments\SegmentsRepository;
+use MailPoet\Services\AuthorizedEmailsController;
 use MailPoet\Settings\Pages;
 use MailPoet\Settings\SettingsController;
 use MailPoet\Subscribers\NewSubscriberNotificationMailer;
@@ -23,6 +36,9 @@ class Reporter {
 
   /** @var SegmentsRepository */
   private $segmentsRepository;
+
+  /** @var DynamicSegmentFilterRepository */
+  private $dynamicSegmentFilterRepository;
 
   /** @var ServicesChecker */
   private $servicesChecker;
@@ -42,6 +58,7 @@ class Reporter {
   public function __construct(
     NewslettersRepository $newslettersRepository,
     SegmentsRepository $segmentsRepository,
+    DynamicSegmentFilterRepository $dynamicSegmentFilterRepository,
     ServicesChecker $servicesChecker,
     SettingsController $settings,
     WooCommerceHelper $woocommerceHelper,
@@ -50,6 +67,7 @@ class Reporter {
   ) {
     $this->newslettersRepository = $newslettersRepository;
     $this->segmentsRepository = $segmentsRepository;
+    $this->dynamicSegmentFilterRepository = $dynamicSegmentFilterRepository;
     $this->servicesChecker = $servicesChecker;
     $this->settings = $settings;
     $this->woocommerceHelper = $woocommerceHelper;
@@ -125,6 +143,26 @@ class Reporter {
       'Plugin > WooCommerce Multi-Currency' => $this->wp->isPluginActive('woocommerce-multi-currency/woocommerce-multi-currency.php'),
       'Plugin > Multi Currency for WooCommerce' => $this->wp->isPluginActive('woo-multi-currency/woo-multi-currency.php'),
       'Web host' => $this->settings->get('mta_group') == 'website' ? $this->settings->get('web_host') : null,
+      'Segment > # of machine-opens' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailOpensAbsoluteCountAction::MACHINE_TYPE),
+      'Segment > # of opens' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailOpensAbsoluteCountAction::TYPE),
+      'Segment > # of orders' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE, WooCommerceNumberOfOrders::ACTION_NUMBER_OF_ORDERS),
+      'Segment > clicked' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_CLICKED),
+      'Segment > clicked any email' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_CLICKED_ANY),
+      'Segment > not clicked' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_NOT_CLICKED),
+      'Segment > not opened' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_NOT_OPENED),
+      'Segment > opened' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_OPENED),
+      'Segment > machine-opened' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_EMAIL, EmailAction::ACTION_MACHINE_OPENED),
+      'Segment > has an active subscription' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE_SUBSCRIPTION, WooCommerceSubscription::ACTION_HAS_ACTIVE),
+      'Segment > is in country' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE, WooCommerceCountry::ACTION_CUSTOMER_COUNTRY),
+      'Segment > MailPoet custom field' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_USER_ROLE, MailPoetCustomFields::TYPE),
+      'Segment > purchased in this category' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE, WooCommerceCategory::ACTION_CATEGORY),
+      'Segment > purchased this product' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE, WooCommerceCategory::ACTION_PRODUCT),
+      'Segment > subscribed date' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_USER_ROLE, SubscriberSubscribedDate::TYPE),
+      'Segment > total spent' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_WOOCOMMERCE, WooCommerceTotalSpent::ACTION_TOTAL_SPENT),
+      'Segment > WordPress user role' => $this->isFilterTypeActive(DynamicSegmentFilterData::TYPE_USER_ROLE, UserRole::TYPE),
+      'Number of segments with multiple conditions' => $this->segmentsRepository->getSegmentCountWithMultipleFilters(),
+      'Support tier' => $this->subscribersFeature->hasPremiumSupport() ? 'premium' : 'free',
+      'Unauthorized email notice shown' => !empty($this->settings->get(AuthorizedEmailsController::AUTHORIZED_EMAIL_ADDRESSES_ERROR_SETTING)),
     ];
     if ($hasWc) {
       $result['WooCommerce version'] = $woocommerce->version;
@@ -157,5 +195,12 @@ class Reporter {
       'sendingMethod' => isset($mta['method']) ? $mta['method'] : null,
       'woocommerceIsInstalled' => $this->woocommerceHelper->isWooCommerceActive(),
     ];
+  }
+
+  private function isFilterTypeActive(string $filterType, string $action): bool {
+    if ($this->dynamicSegmentFilterRepository->findOnyByFilterTypeAndAction($filterType, $action)) {
+      return true;
+    }
+    return false;
   }
 }

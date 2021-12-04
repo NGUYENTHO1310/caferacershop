@@ -82,10 +82,10 @@ abstract class Repository {
   public function truncate() {
     $tableName = $this->classMetadata->getTableName();
     $connection = $this->entityManager->getConnection();
-    $connection->query('SET FOREIGN_KEY_CHECKS=0');
+    $connection->executeQuery('SET FOREIGN_KEY_CHECKS=0');
     $q = "TRUNCATE $tableName";
-    $connection->executeUpdate($q);
-    $connection->query('SET FOREIGN_KEY_CHECKS=1');
+    $connection->executeStatement($q);
+    $connection->executeQuery('SET FOREIGN_KEY_CHECKS=1');
   }
 
   /**
@@ -104,6 +104,17 @@ abstract class Repository {
 
   public function flush() {
     $this->entityManager->flush();
+  }
+
+  public function getReference($id) {
+    return $this->entityManager->getReference($this->getEntityClassName(), $id);
+  }
+
+  /**
+   * @param T $entity
+   */
+  public function detach($entity) {
+    $this->entityManager->detach($entity);
   }
 
   /**

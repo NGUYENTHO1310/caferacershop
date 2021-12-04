@@ -10,10 +10,11 @@ get_header(); ?>
   <div class="container">
     <header class="entry-header  header-footer-group">
       <div class="entry-header-inner section-inner medium">
+        <h1 class="entry-title">FAQ</h1>
       </div>
     </header>
     <?php 
-      $args = array( 'post_type' => 'faqs','posts_per_page' =>  '20' );
+      $args = array( 'post_type' => 'fags','posts_per_page' =>  '20' );
       $loop = new WP_Query( $args );
       while ( $loop->have_posts() ) : $loop->the_post();
     ?> 	

@@ -70,9 +70,11 @@ class ScheduledTasksRepository extends Repository {
   public function findScheduledOrRunningTask(?string $type): ?ScheduledTaskEntity {
     $queryBuilder = $this->doctrineRepository->createQueryBuilder('st')
       ->select('st')
-      ->where('(st.status = :scheduledStatus) OR (st.status is NULL)')
+      ->where('((st.status = :scheduledStatus) OR (st.status is NULL))')
       ->andWhere('st.deletedAt IS NULL')
-      ->setParameter('scheduledStatus', ScheduledTaskEntity::STATUS_SCHEDULED);
+      ->setParameter('scheduledStatus', ScheduledTaskEntity::STATUS_SCHEDULED)
+      ->setMaxResults(1)
+      ->orderBy('st.scheduledAt', 'DESC');
     if (!empty($type)) {
       $queryBuilder
         ->andWhere('st.type = :type')
@@ -86,7 +88,9 @@ class ScheduledTasksRepository extends Repository {
       ->select('st')
       ->where('st.status = :scheduledStatus')
       ->andWhere('st.deletedAt IS NULL')
-      ->setParameter('scheduledStatus', ScheduledTaskEntity::STATUS_SCHEDULED);
+      ->setParameter('scheduledStatus', ScheduledTaskEntity::STATUS_SCHEDULED)
+      ->setMaxResults(1)
+      ->orderBy('st.scheduledAt', 'DESC');
     if (!empty($type)) {
       $queryBuilder
         ->andWhere('st.type = :type')
@@ -118,6 +122,10 @@ class ScheduledTasksRepository extends Repository {
 
   public function findCompletedByType($type, $limit = null) {
     return $this->findByTypeAndStatus($type, ScheduledTaskEntity::STATUS_COMPLETED, $limit);
+  }
+
+  public function findFutureScheduledByType($type, $limit = null) {
+    return $this->findByTypeAndStatus($type, ScheduledTaskEntity::STATUS_SCHEDULED, $limit, true);
   }
 
   protected function findByTypeAndStatus($type, $status, $limit = null, $future = false) {
